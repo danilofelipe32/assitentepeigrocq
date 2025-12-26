@@ -50,6 +50,7 @@ export const callGenerativeAI = async (prompt: string | any[]): Promise<string> 
         }
     });
 
-    requestQueue = currentOperation.catch(() => {});
+    // FIX: Ensure requestQueue remains a Promise<void> by chaining then(() => {}) to resolve the 'Promise<string | void>' mismatch.
+    requestQueue = currentOperation.then(() => {}).catch(() => {});
     return currentOperation;
 };
