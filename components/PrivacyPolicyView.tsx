@@ -16,8 +16,8 @@ export const PrivacyPolicyView = () => {
             </section>
 
             <section>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">2. Processamento de IA (Groq Cloud)</h3>
-                <p>Para fornecer as funcionalidades de geração de conteúdo e análise, os dados contextuais do PEI são enviados de forma criptografada para os servidores da <strong>Groq Cloud</strong>, utilizando o modelo de linguagem Llama 3.3. Esses dados são processados apenas para gerar a resposta e não são persistidos permanentemente pela Groq ou utilizados para treinamento de modelos de terceiros.</p>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">2. Processamento de IA (Google Gemini)</h3>
+                <p>Para fornecer as funcionalidades de geração de conteúdo e análise, os dados contextuais do PEI são enviados de forma segura para os servidores da <strong>Google Gemini API</strong>. Esses dados são processados apenas para gerar a resposta solicitada e o processamento é regido pelas políticas de privacidade da Google Cloud API.</p>
             </section>
 
             <section>

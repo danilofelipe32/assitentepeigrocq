@@ -52,7 +52,7 @@ export const Sidebar = ({ isSidebarOpen, onNavigate }: SidebarProps) => {
             </nav>
 
             <div className="p-4 border-t border-gray-100 text-center">
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Modo Groq Cloud (Llama 3.3)</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Modo Google Gemini Pro Ativado</p>
             </div>
         </aside>
     );

@@ -1,17 +1,19 @@
 
+import { GoogleGenAI } from "@google/genai";
+
 // Global queue variables for Serializing Requests
 let requestQueue = Promise.resolve();
 let lastRequestTime = 0;
 const RATE_LIMIT_DELAY = 1000; 
 
 /**
- * Service to interact with Groq API.
- * Uses the OpenAI-compatible endpoint as requested.
+ * Service to interact with Google Gemini API.
+ * Follows the strictly required SDK patterns.
  */
 export const callGenerativeAI = async (prompt: string | any[]): Promise<string> => {
     const systemInstruction = "Você é um assistente especializado em educação, focado na criação de Planos Educacionais Individualizados (PEI). Suas respostas devem ser profissionais, bem estruturadas e direcionadas para auxiliar educadores. Sempre que apropriado, considere e sugira estratégias baseadas nos princípios do Desenho Universal para a Aprendizagem (DUA).";
     
-    // Serialization of requests to avoid overwhelming the model or hitting quota limits too fast
+    // Serialization of requests
     const currentOperation = requestQueue.then(async () => {
         const now = Date.now();
         const timeSinceLast = now - lastRequestTime;
@@ -22,40 +24,29 @@ export const callGenerativeAI = async (prompt: string | any[]): Promise<string> 
         try {
             lastRequestTime = Date.now();
             
-            let userMessage = "";
+            // Initialize AI client inside the call to ensure fresh key usage if needed
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            
+            let userPrompt = "";
             if (typeof prompt === 'string') {
-                userMessage = prompt;
+                userPrompt = prompt;
             } else if (Array.isArray(prompt)) {
-                userMessage = prompt.map(p => p.text || "").join("\n");
+                userPrompt = prompt.map(p => p.text || "").join("\n");
             }
 
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'llama-3.3-70b-versatile',
-                    messages: [
-                        { role: 'system', content: systemInstruction },
-                        { role: 'user', content: userMessage }
-                    ],
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-flash-preview',
+                contents: userPrompt,
+                config: {
+                    systemInstruction: systemInstruction,
                     temperature: 0.7,
-                    max_tokens: 4096
-                })
+                },
             });
 
-            if (!response.ok) {
-                const errorBody = await response.json().catch(() => ({}));
-                throw new Error(errorBody.error?.message || `Erro na API Groq: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.choices[0]?.message?.content || '';
-        } catch (error) {
-            console.error("Erro na API Groq:", error);
-            throw new Error("Falha na comunicação com a IA Groq (Llama 3.3).");
+            return response.text || '';
+        } catch (error: any) {
+            console.error("Erro na API Gemini:", error);
+            throw new Error(`Falha na comunicação com a IA: ${error.message}`);
         }
     });
 
